@@ -40,3 +40,11 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Visual Studio & .NET
+.vs/
+**/[Bb]in/
+**/[Oo]bj/
+*.user
+*.suo
+*.sln.docstates

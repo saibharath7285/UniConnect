@@ -3,25 +3,24 @@ using UniConnect.API.Models;
 
 namespace UniConnect.API.Controllers;
 
+[ApiController]
 [Route("api/files")]
-public class FilesController : BaseController
+public class FilesController : ControllerBase
 {
-    private readonly IWebHostEnvironment _environment;
+    private readonly IWebHostEnvironment _env;
 
-    public FilesController(IWebHostEnvironment environment)
+    public FilesController(IWebHostEnvironment env)
     {
-        _environment = environment;
+        _env = env;
     }
 
     [HttpPost]
-    public async Task<ActionResult<OperationResult<FileUploadResponseDto>>> Upload([FromForm] IFormFile? file)
+    public async Task<ActionResult<OperationResult<FileUploadResponseDto>>> Upload(IFormFile? file)
     {
         if (file == null || file.Length == 0)
-        {
             return BadRequest(OperationResult<FileUploadResponseDto>.Fail("No file provided."));
-        }
 
-        var uploadDir = Path.Combine(_environment.ContentRootPath, "uploads");
+        var uploadDir = Path.Combine(_env.ContentRootPath, "uploads");
         Directory.CreateDirectory(uploadDir);
 
         var safeFileName = $"{Guid.NewGuid():N}_{Path.GetFileName(file.FileName)}";
