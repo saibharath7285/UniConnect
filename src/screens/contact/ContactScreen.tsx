@@ -1,49 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { styles } from './ContactScreen.styles';
+import { useContact } from './useContact';
 
-export default function App() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [notes, setNotes] = useState('');
-
-  const handleCancel = () => {
-    setName('');
-    setEmail('');
-    setNotes('');
-  };
-
-  const handleSubmit = () => {
-    if (!name.trim() || !email.trim()) {
-      Alert.alert('Required Fields', 'Please enter your Name and Email address.');
-      return;
-    }
-
-    Alert.alert(
-      'Form Submitted',
-      `Name: ${name.trim()}\nEmail: ${email.trim()}\nNotes: ${notes.trim() || 'None'}`,
-      [
-        {
-          text: 'OK',
-          onPress: handleCancel,
-        },
-      ]
-    );
-  };
+export default function ContactScreen() {
+  const {
+    name,
+    setName,
+    email,
+    setEmail,
+    notes,
+    setNotes,
+    submitting,
+    handleCancel,
+    handleSubmit,
+  } = useContact();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <StatusBar style="dark" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -103,6 +88,7 @@ export default function App() {
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
                 onPress={handleCancel}
+                disabled={submitting}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Cancel request"
@@ -111,13 +97,18 @@ export default function App() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, styles.submitButton]}
+                style={[styles.button, styles.submitButton, submitting && { opacity: 0.7 }]}
                 onPress={handleSubmit}
+                disabled={submitting}
                 activeOpacity={0.7}
                 accessibilityRole="button"
                 accessibilityLabel="Submit request"
               >
-                <Text style={styles.submitButtonText}>Submit</Text>
+                {submitting ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.submitButtonText}>Submit</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -126,92 +117,3 @@ export default function App() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f3f4f6',
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 24,
-  },
-  inputGroup: {
-    marginBottom: 18,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    fontSize: 16,
-    color: '#111827',
-    backgroundColor: '#f9fafb',
-  },
-  textArea: {
-    minHeight: 90,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 10,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#f3f4f6',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-  },
-  cancelButtonText: {
-    color: '#4b5563',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  submitButton: {
-    backgroundColor: '#2563eb',
-  },
-  submitButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
